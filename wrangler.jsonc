@@ -1,8 +1,4 @@
 {
-  // Cloudflare Workers config for the secrets_rnd demo
-  // 2 envs (dev, prod), each with own Worker name, vars, route, and CF-stored secrets
-  // Secrets (SECRET_VALUE) are NOT declared here — they are pushed at deploy time
-  // by the GitHub Action via `wrangler secret bulk` from the chosen GH Environment
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "secrets-rnd",
   "main": ".open-next/worker.js",
@@ -13,33 +9,23 @@
     "directory": ".open-next/assets"
   },
   "minify": true,
-  "observability": {
-    "enabled": true
-  },
   "env": {
     "dev": {
       "name": "secrets-rnd-dev",
       "vars": {
-        // build-time plaintext env var (NOT a secret) — used by page to identify which worker served it
-        "APP_NAME": "secrets-rnd-dev"
+        "NEXT_PUBLIC_ENV_NAME": "dev"
       },
       "routes": [
-        {
-          "pattern": "dev.akib35.dev/*",
-          "custom_domain": true
-        }
+        { "pattern": "dev.akib35.dev/*", "custom_domain": true }
       ]
     },
     "prod": {
       "name": "secrets-rnd-prod",
       "vars": {
-        "APP_NAME": "secrets-rnd-prod"
+        "NEXT_PUBLIC_ENV_NAME": "prod"
       },
       "routes": [
-        {
-          "pattern": "prod.akib35.dev/*",
-          "custom_domain": true
-        }
+        { "pattern": "prod.akib35.dev/*", "custom_domain": true }
       ]
     }
   }

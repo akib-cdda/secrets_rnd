@@ -1,50 +1,21 @@
-// Server component — runs on Cloudflare Worker at request time.
-// Reads bindings from the Cloudflare runtime via OpenNext:
-//   - env.APP_NAME      : from wrangler.jsonc `vars` (build-time, plaintext)
-//   - env.SECRET_VALUE  : from `wrangler secret bulk` pushed by GH Action (runtime, encrypted at rest in CF)
+// Default Next.js server component.
+// - NEXT_PUBLIC_ENV_NAME: from wrangler.jsonc `vars` (build-time inlined, public)
+// - SECRET_VALUE: from `wrangler secret bulk` pushed by GH Action at deploy (runtime)
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-export default async function Page() {
-  const { env } = await getCloudflareContext();
-  // Cast to a loose shape so the demo doesn't need a generated
-  // `cloudflare-env.d.ts` file. For production, run
-  // `npm run cf-typegen` and use the typed env.
-  const bindings = env as unknown as Record<string, string | undefined>;
+// Opt out of static prerender so we can read runtime env on each request.
+export const dynamic = "force-dynamic";
 
-  // APP_NAME is set in wrangler.jsonc vars, differs per worker (dev/prod)
-  // SECRET_VALUE is pushed at deploy time from the chosen GH Environment
-  const appName = bindings.APP_NAME ?? "unknown";
-  const secret = bindings.SECRET_VALUE ?? "(no secret)";
+export default async function Page() {
+  const envName = process.env.NEXT_PUBLIC_ENV_NAME ?? "unknown";
+
+  const { env } = await getCloudflareContext({ async: true });
+  const secret = (env.SECRET_VALUE as string | undefined) ?? "(no secret)";
 
   return (
     <main>
-      <h1 style={{ fontSize: 18, margin: 0, color: "#7ee787" }}>
-        Secrets Demo
-      </h1>
-      <p style={{ margin: "24px 0 8px", color: "#9ca3af", fontSize: 12 }}>
-        App
-      </p>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 20,
-          color: "#e6e6e6",
-        }}
-      >
-        {appName}
-      </p>
-      <p style={{ margin: "24px 0 8px", color: "#9ca3af", fontSize: 12 }}>
-        Secret (from GH env: dev | prod)
-      </p>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 20,
-          color: "#ffd479",
-        }}
-      >
-        {secret}
-      </p>
+      <h1 style={{ fontSize: 24, margin: 0 }}>Env: {envName}</h1>
+      <p style={{ marginTop: 16, fontSize: 18 }}>Secret: {secret}</p>
     </main>
   );
 }

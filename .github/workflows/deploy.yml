@@ -1,9 +1,5 @@
 name: Deploy
 
-# Manual trigger only. User picks target env (dev | prod) at run time.
-# The `environment: ${{ inputs.env }}` line on the job scopes all `secrets.*`
-# reads to the chosen GitHub Environment — this is what makes per-env
-# secrets work and what scales past the 100-repo-secret cap.
 on:
   workflow_dispatch:
     inputs:
@@ -19,35 +15,23 @@ jobs:
   deploy:
     name: Deploy [${{ inputs.env }}]
     runs-on: ubuntu-latest
-    # CRITICAL: scopes secrets to chosen env. Without this line, env-scoped
-    # secrets resolve to empty strings.
+    # Scopes all `secrets.*` reads to the chosen GH Environment.
     environment: ${{ inputs.env }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        # Using `npm install` (not `npm ci`) because no package-lock.json
-        # is committed in this demo repo. For production, commit the
-        # lockfile and switch back to `npm ci` for deterministic builds.
-        # --legacy-peer-deps: Next 15.0.x peer range doesn't include
-        # exact react 19.0.0 (only RC). Same flag re-saas uses.
+      - name: Install
         run: npm install --legacy-peer-deps
 
-      - name: Build (OpenNext for Cloudflare)
+      - name: Build
         run: npx opennextjs-cloudflare build
 
-      # Push the per-env secret(s) from GH into the Cloudflare Worker.
-      # Reuses the same pattern as re-saas: build a JSON blob, feed to
-      # `wrangler secret bulk`, then delete the file. For the demo we have
-      # 1 secret; the JSON shape extends to N without changing the step.
-      - name: Sync secret to Worker
+      - name: Push secret to Worker
         env:
           SECRET_VALUE: ${{ secrets.SECRET_VALUE }}
         run: |
@@ -55,7 +39,7 @@ jobs:
           npx wrangler secret bulk /tmp/secrets.json --env ${{ inputs.env }}
           rm -f /tmp/secrets.json
 
-      - name: Deploy Worker
+      - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
