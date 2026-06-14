@@ -33,7 +33,10 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        # Using `npm install` (not `npm ci`) because no package-lock.json
+        # is committed in this demo repo. For production, commit the
+        # lockfile and switch back to `npm ci` for deterministic builds.
+        run: npm install
 
       - name: Build (OpenNext for Cloudflare)
         run: npx opennextjs-cloudflare build
