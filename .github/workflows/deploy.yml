@@ -36,7 +36,9 @@ jobs:
         # Using `npm install` (not `npm ci`) because no package-lock.json
         # is committed in this demo repo. For production, commit the
         # lockfile and switch back to `npm ci` for deterministic builds.
-        run: npm install
+        # --legacy-peer-deps: Next 15.0.x peer range doesn't include
+        # exact react 19.0.0 (only RC). Same flag re-saas uses.
+        run: npm install --legacy-peer-deps
 
       - name: Build (OpenNext for Cloudflare)
         run: npx opennextjs-cloudflare build
