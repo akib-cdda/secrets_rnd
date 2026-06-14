@@ -16,7 +16,7 @@
         "NEXT_PUBLIC_ENV_NAME": "dev"
       },
       "routes": [
-        { "pattern": "dev.akib35.dev/*", "custom_domain": true }
+        { "pattern": "dev.akib35.dev/*", "zone_name": "akib35.dev" }
       ]
     },
     "prod": {
@@ -25,7 +25,7 @@
         "NEXT_PUBLIC_ENV_NAME": "prod"
       },
       "routes": [
-        { "pattern": "prod.akib35.dev/*", "custom_domain": true }
+        { "pattern": "prod.akib35.dev/*", "zone_name": "akib35.dev" }
       ]
     }
   }
