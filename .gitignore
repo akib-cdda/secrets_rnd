@@ -1,0 +1,30 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# next.js
+.next
+out
+build
+
+# opennext cloudflare
+.open-next
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+
+# env files (never commit)
+.env
+.env*.local
+.dev.vars
+.dev.vars.*
+
+# wrangler
+.wrangler
+
+# typescript generated
+cloudflare-env.d.ts
