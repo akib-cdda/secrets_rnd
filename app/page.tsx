@@ -6,11 +6,15 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export default async function Page() {
   const { env } = await getCloudflareContext();
+  // Cast to a loose shape so the demo doesn't need a generated
+  // `cloudflare-env.d.ts` file. For production, run
+  // `npm run cf-typegen` and use the typed env.
+  const bindings = env as unknown as Record<string, string | undefined>;
 
   // APP_NAME is set in wrangler.jsonc vars, differs per worker (dev/prod)
   // SECRET_VALUE is pushed at deploy time from the chosen GH Environment
-  const appName = (env.APP_NAME as string) ?? "unknown";
-  const secret = (env.SECRET_VALUE as string) ?? "(no secret)";
+  const appName = bindings.APP_NAME ?? "unknown";
+  const secret = bindings.SECRET_VALUE ?? "(no secret)";
 
   return (
     <main>
