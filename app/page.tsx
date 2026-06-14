@@ -10,7 +10,7 @@ export default async function Page() {
   const envName = process.env.NEXT_PUBLIC_ENV_NAME ?? "unknown";
 
   const { env } = await getCloudflareContext({ async: true });
-  const secret = (env.SECRET_VALUE as string | undefined) ?? "(no secret)";
+  const secret = (env["SECRET_VALUE"] as string | undefined) ?? "(no secret)";
 
   return (
     <main>
